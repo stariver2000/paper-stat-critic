@@ -49,8 +49,14 @@ core is a data transformation, which a pipeline expresses directly.
 **ingest** splits each page into paragraph-sized blocks with ids `p{page}b{n}`.
 The LLM cites these ids, so they must be stable for the same PDF.
 
-**extract** sends the blocks plus the JSON Schema of `model.Extraction` to
-the LLM. Field descriptions in `model/extraction.py` are part of the prompt.
+**extract** asks the LLM for design and measures in one call over the whole
+paper (`prompt_design.md`), and for reported tests in one call per chunk of
+consecutive blocks (`prompt_tests.md`, `extract_chunk_chars`, default 15,000).
+Calls run concurrently (`llm_workers`). Chunk answers are concatenated in
+order, exact repeats dropped and ids renumbered. Chunking exists because a
+single call over a long paper sometimes lists only a few of its tests
+(one 78k-character paper: 8 tests on one run, 44 on the next). Field
+descriptions in `model/extraction.py` are part of the prompt.
 
 **verify** runs every check registered in `stages/verify/checks/__init__.py`:
 
@@ -65,7 +71,7 @@ the LLM. Field descriptions in `model/extraction.py` are part of the prompt.
 
 Only LLM stages are cached; deterministic stages always rerun so a code
 change never leaves a stale result. The extract cache key hashes the
-document, the prompt + schema (`extract.prompt_fingerprint()`) and the LLM
+document, the prompts + schemas + chunk size (`extract.prompt_fingerprint()`) and the LLM
 fingerprint (backend + model). Changing any of them invalidates the cache.
 `--force` ignores it.
 

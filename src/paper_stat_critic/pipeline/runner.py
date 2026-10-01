@@ -78,12 +78,15 @@ def run_pipeline(
     if StageName.EXTRACT in stages:
         # The key covers the document, the prompt+schema and the model, so
         # editing any of them invalidates the stored extraction.
-        extract_key = _hash(document_key, extract.prompt_fingerprint(), adapters.llm.fingerprint)
+        prompt_key = extract.prompt_fingerprint(config.extract_chunk_chars)
+        extract_key = _hash(document_key, prompt_key, adapters.llm.fingerprint)
         if not force:
             extraction = store.load(StageName.EXTRACT, Extraction, extract_key)
         extraction_cached = extraction is not None
         if extraction is None:
-            extraction = extract.run(document, adapters.llm)
+            extraction = extract.run(
+                document, adapters.llm, config.extract_chunk_chars, config.llm_workers
+            )
             store.save(StageName.EXTRACT, extraction, Extraction, extract_key)
 
     findings: list[Finding] | None = None

@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Secrets: never commit credentials of any kind.
+.env
+.env.*
+*.pem
+*.key
+.anthropic
+credentials*.json
+
+# Pipeline outputs contain full paper text (copyrighted, possibly unpublished).
+runs/
+
+# Papers are copyrighted. Tests build their PDFs in code instead.
+*.pdf
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store

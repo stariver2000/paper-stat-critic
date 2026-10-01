@@ -1,0 +1,44 @@
+[project]
+name = "paper-stat-critic"
+version = "0.1.0"
+description = "Critical statistical review of research papers: extract reported tests, recompute them, flag questionable analyses."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.7",
+    "pypdfium2>=4.30",
+    "scipy>=1.13",
+    "typer>=0.12",
+]
+
+[project.scripts]
+paper-stat-critic = "paper_stat_critic.interfaces.cli:app"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=3.7",
+    "pytest>=8.2",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/paper_stat_critic"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+# SIM103 folds guard clauses into one boolean expression; CONTRIBUTING.md
+# prefers explicit step-by-step checks over the shorter form.
+ignore = ["SIM103"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

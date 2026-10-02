@@ -54,9 +54,12 @@ paper (`prompt_design.md`), and for reported tests in one call per chunk of
 consecutive blocks (`prompt_tests.md`, `extract_chunk_chars`, default 15,000).
 Calls run concurrently (`llm_workers`). Chunk answers are concatenated in
 order, exact repeats dropped and ids renumbered. Chunking exists because a
-single call over a long paper sometimes lists only a few of its tests
-(one 78k-character paper: 8 tests on one run, 44 on the next). Field
-descriptions in `model/extraction.py` are part of the prompt.
+single call over the whole paper skips tests reported in tables and
+sometimes stops after a few tests of a long paper. In a controlled
+comparison on synthetic papers with tables, whole-paper extraction missed
+6.7% of table tests (and none in running text) while chunked extraction
+missed none. Field descriptions in `model/extraction.py` are part of the
+prompt.
 
 **verify** runs every check registered in `stages/verify/checks/__init__.py`:
 

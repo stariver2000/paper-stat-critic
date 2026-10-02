@@ -1,10 +1,11 @@
 """extract: Document -> Extraction, using an LLM with a JSON Schema.
 
 Design and measures come from one call over the whole paper. Tests come from
-one call per chunk of blocks: asked to list every test of a long paper in a
-single answer, the model sometimes stops after a handful (one 78k-character
-paper gave 8 tests on one run and 44 on the next), so each call gets a part
-short enough to enumerate completely.
+one call per chunk of blocks: asked for every test of a whole paper in a
+single answer, the model skips tests reported in tables and sometimes stops
+after a handful in long papers (one 78k-character paper gave 8 tests on one
+run and 44 on the next). Each call therefore gets a part short enough to
+enumerate completely.
 """
 
 import hashlib

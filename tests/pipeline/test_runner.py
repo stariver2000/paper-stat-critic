@@ -27,16 +27,18 @@ def test_full_run_writes_numbered_artifacts(tmp_path):
 def test_extraction_is_cached(tmp_path):
     pdf_path, config, adapters, llm = setup(tmp_path)
     run_pipeline(pdf_path, config, adapters)
+    calls_after_first = len(llm.calls)
     second = run_pipeline(pdf_path, config, adapters)
-    assert len(llm.calls) == 1
+    assert len(llm.calls) == calls_after_first
     assert second.extraction_cached
 
 
 def test_force_ignores_cache(tmp_path):
     pdf_path, config, adapters, llm = setup(tmp_path)
     run_pipeline(pdf_path, config, adapters)
+    calls_after_first = len(llm.calls)
     run_pipeline(pdf_path, config, adapters, force=True)
-    assert len(llm.calls) == 2
+    assert len(llm.calls) == 2 * calls_after_first
 
 
 def test_until_ingest_skips_llm(tmp_path):

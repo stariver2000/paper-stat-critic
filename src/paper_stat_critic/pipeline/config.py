@@ -10,3 +10,8 @@ class ReviewConfig:
     claude_binary: str = "claude"
     model: str = "sonnet"
     llm_timeout_s: float = 600.0
+    # Characters per test-extraction call. Small enough that the model lists
+    # every test in its part; see stages/extract/run.py.
+    extract_chunk_chars: int = 15_000
+    # Concurrent LLM calls within one paper.
+    llm_workers: int = 4

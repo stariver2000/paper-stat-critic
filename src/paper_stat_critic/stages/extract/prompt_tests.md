@@ -13,8 +13,14 @@ Rules:
 - For `p < .001` set `p_comparator` to `<` and `p_value` to `.001`.
 - Every `evidence.quote` must be a verbatim span copied from one block, and
   `evidence.block_id` must be that block's id.
-- When the paper does not state something, use null. Never compute or guess
-  a value that is not printed.
+- Set `p_adjusted` to true only when the text says this p is corrected for
+  multiple comparisons or comes from a post-hoc procedure that adjusts p
+  (Tukey HSD, Bonferroni, Holm, FDR, ...). A statement such as "followed by
+  Tukey HSD post-hoc tests" applies to the pairwise tests it introduces.
+- Set `one_tailed` to true only when the text states the test was one-tailed,
+  one-sided or directional.
+- When the paper does not state something, use null (or false for the two
+  flags above). Never compute or guess a value that is not printed.
 
 <paper>
 $document

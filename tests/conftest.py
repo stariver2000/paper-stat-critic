@@ -24,6 +24,8 @@ def make_test(
     comparator: PComparator = PComparator.EQ,
     test_id: str = "T1",
     quote: str = "quote",
+    p_adjusted: bool = False,
+    one_tailed: bool = False,
 ) -> ReportedTest:
     return ReportedTest(
         id=test_id,
@@ -34,6 +36,8 @@ def make_test(
         statistic=statistic,
         p_comparator=comparator,
         p_value=p_value,
+        p_adjusted=p_adjusted,
+        one_tailed=one_tailed,
         evidence=Evidence(quote=quote, block_id=None),
     )
 

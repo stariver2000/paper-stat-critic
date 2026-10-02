@@ -51,6 +51,16 @@ class ReportedTest(BaseModel):
     statistic: str = Field(description="Test statistic exactly as printed, e.g. '-2.10'.")
     p_comparator: PComparator | None = Field(description="Relation printed before p.")
     p_value: str | None = Field(description="p exactly as printed, e.g. '.045'.")
+    p_adjusted: bool = Field(
+        description=(
+            "True only if the paper says this p is corrected for multiple comparisons or comes "
+            "from a post-hoc procedure that adjusts p (e.g. Tukey HSD, Bonferroni, Holm, FDR, "
+            "Sidak, Scheffe, Games-Howell)."
+        )
+    )
+    one_tailed: bool = Field(
+        description="True only if the paper says the test was one-tailed, one-sided or directional."
+    )
     evidence: Evidence
 
 

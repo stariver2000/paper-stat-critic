@@ -68,7 +68,12 @@ prompt.
 - `pvalue_recompute`: statcheck-style. A reported p is consistent if any
   statistic that rounds to the printed one yields it. Severity:
   `high` if the significance decision at α = .05 flips, `low` if only a
-  one-tailed reading matches, otherwise `medium`.
+  one-tailed reading matches, otherwise `medium`. Context extracted with each
+  test is respected: a p the paper reports as adjusted (`p_adjusted`, e.g.
+  Tukey HSD) is not recomputed and yields an `info` note; a test the paper
+  states is one-tailed (`one_tailed`) is checked against the one-tailed p.
+  In an audit of 22 real papers these two cases were the source of almost
+  all false alarms.
 
 ## Caching
 

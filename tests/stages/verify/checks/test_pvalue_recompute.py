@@ -77,3 +77,28 @@ def test_unicode_minus_is_parsed():
 )
 def test_uncheckable_tests_are_skipped(test):
     assert run_one(test) == []
+
+
+def test_adjusted_p_is_info_not_inconsistency():
+    # Tukey-adjusted p from a real paper: t(67) = 3.729 gives unadjusted p = .0004.
+    test = make_test(StatisticKind.T, "3.729", "0.0012", df1=67, p_adjusted=True)
+    [finding] = run_one(test)
+    assert finding.severity is Severity.INFO
+
+
+def test_stated_one_tailed_is_judged_one_tailed():
+    # One-tailed p for t(30) = 1.33 is .097, which is what the paper reported.
+    test = make_test(StatisticKind.T, "1.33", "0.097", df1=30, one_tailed=True)
+    assert run_one(test) == []
+
+
+def test_stated_one_tailed_can_still_be_inconsistent():
+    test = make_test(StatisticKind.T, "1.33", "0.020", df1=30, one_tailed=True)
+    [finding] = run_one(test)
+    assert finding.severity is not Severity.LOW
+    assert "one-tailed, as stated" in finding.detail
+
+
+def test_one_tailed_flag_is_ignored_for_f():
+    test = make_test(StatisticKind.F, "4.41", ".045", df1=1, df2=28, one_tailed=True)
+    assert run_one(test) == []

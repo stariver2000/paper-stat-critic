@@ -2,6 +2,12 @@
 
 Same idea as statcheck (Nuijten et al., 2016): a reported p is consistent if
 it matches some p obtainable from a statistic that rounds to the printed one.
+
+Context the paper states is respected. An adjusted p (Tukey, Bonferroni, ...)
+cannot be recomputed from the unadjusted statistic, so it is reported as info
+instead of an inconsistency. A test stated to be one-tailed is checked against
+the one-tailed p. Without these, most false alarms in an audit of 22 real
+papers came from exactly these two cases.
 """
 
 import math
@@ -109,19 +115,42 @@ def _format_df(test: ReportedTest) -> str:
     return f"({test.df1:g})"
 
 
+def _adjusted_note(test: ReportedTest) -> Finding:
+    return Finding(
+        check=NAME,
+        severity=Severity.INFO,
+        title=f"{test.id}: adjusted p not recomputed",
+        detail="The paper reports this p as adjusted for multiple comparisons; "
+        "it cannot be recomputed from the unadjusted statistic.",
+        test_ids=[test.id],
+        evidence=[test.evidence],
+    )
+
+
 def _finding_for(test: ReportedTest) -> Finding | None:
+    if test.p_adjusted:
+        return _adjusted_note(test)
+
     p_low, p_high = p_range(test)
+    # A stated one-tailed test is judged on the one-tailed p; the "matches
+    # only one-tailed" hint below is then meaningless and is skipped.
+    one_tailed = test.one_tailed and test.kind in _TWO_TAILED_KINDS
+    if one_tailed:
+        p_low, p_high = p_low / 2, p_high / 2
     if is_consistent(test.p_comparator, test.p_value, p_low, p_high):
         return None
 
     printed = parse_number(test.statistic)
     computed = p_from_statistic(test.kind, printed, test.df1, test.df2)
+    if one_tailed:
+        computed = computed / 2
     reported_text = f"{test.kind.value}{_format_df(test)} = {test.statistic}, "
     reported_text += f"p {test.p_comparator.value} {test.p_value}"
-    detail = f"Reported {reported_text}; recomputed p = {computed:.4f}."
+    tail_note = " (one-tailed, as stated)" if one_tailed else ""
+    detail = f"Reported {reported_text}; recomputed p{tail_note} = {computed:.4f}."
 
     one_tailed_ok = False
-    if test.kind in _TWO_TAILED_KINDS:
+    if test.kind in _TWO_TAILED_KINDS and not one_tailed:
         one_tailed_ok = is_consistent(test.p_comparator, test.p_value, p_low / 2, p_high / 2)
 
     if one_tailed_ok:
